@@ -372,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         double[][] l={{0},{0},{0}};
         double[][] A={{0,0},{0,0},{0,0}};
         double[][] x={{0},{0}};
-        double[][] w=calcluateDistanceweight(rttrange);
+//        double[][] w=calcluateDistanceweight(rttrange);
         for(int i=1;i<rttrange.length;i++){
             l[i-1][0]=(rttrange[1]*rttrange[1]-rttrange[0]*rttrange[0]+rttrefer[0][0]*rttrefer[0][0]+
                     rttrefer[0][1]*rttrefer[0][1]-
@@ -383,11 +383,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         Matrix matrix_a=new Matrix(A);
         Matrix matrix_l=new Matrix(l);
-        Matrix matrix_w=new Matrix(w);
+//        Matrix matrix_w=new Matrix(w);
         Matrix X=new Matrix(x);
-        X=(matrix_a.transpose().times(matrix_w).times(matrix_a).inverse())
-                .times(matrix_a.transpose()).times(matrix_w).times(matrix_l);
-        //X=((matrix_a.transpose().times(matrix_a).inverse()).times(matrix_a.transpose())).times(matrix_l);
+//        X=((((matrix_a.transpose().times(matrix_w).times(matrix_a).inverse()))
+//                .times(matrix_a.transpose())).times(matrix_w)).times(matrix_l);
+        X=((matrix_a.transpose().times(matrix_a).inverse()).times(matrix_a.transpose())).times(matrix_l);
         Log.d(TAG,"x...."+X.getMatrix(0,1,0,0));
         textView10.setText("coordinate is: "+X.getMatrix(0,1,0,0));
     }
