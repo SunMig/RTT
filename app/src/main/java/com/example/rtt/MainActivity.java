@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     //测距请求
                     queneNextRange();
                 }
-                //求五次成功测距的均值
+                //求五次成功测距的均值，（后续可以再改）
                 if(IterTimes>=5){
                     String string="",str="";
                     double[] rttrange=new double[4];
@@ -343,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         Log.d(TAG,"Stirng "+string);
                         index++;
                     }
-//                    Log.d(TAG,"Stirng "+string);
+                    Log.d(TAG,"Stirng "+string);
                     for(Map.Entry<String,Double> entry:RSSIHashMap.entrySet()){
                         double rssi=entry.getValue()/5;
                         Log.d(TAG,entry.getKey()+" "+rssi);
@@ -367,11 +367,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
     }
-    //测距定位算法,目前程序支持4个AP的定位解算
+    //测距定位算法（WLS算法）,目前程序支持4个AP的定位解算
     private void LeastSquareMethod(double[] rttrange) {
         double[][] l={{0},{0},{0}};
         double[][] A={{0,0},{0,0},{0,0}};
         double[][] x={{0},{0}};
+        //需要增加实时测距数据补偿，主要是LS拟合系数0.0035，0.0648，0.4402
+        for(int i=0;i<rttrange.length;i++){
+            rttrange[i]=rttrange[i]+0.0035*rttrange[i]*rttrange[i]+0.0648*rttrange[i]+0.4402;
+        }
 //        double[][] w=calcluateDistanceweight(rttrange);
         for(int i=1;i<rttrange.length;i++){
             l[i-1][0]=(rttrange[1]*rttrange[1]-rttrange[0]*rttrange[0]+rttrefer[0][0]*rttrefer[0][0]+
