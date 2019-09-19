@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     float[] magVal=new float[3];
     float[] gVal=new float[3];
     float[] grVal=new float[3];
-    double[][] rttrefer={{19.52,0},{11.3,5.85},{0.85,5.85},{9.2,0}};
+    double[][] rttrefer={{18.4,0},{11.3,5.36},{0.85,5.36},{9.1,0}};//e0,9c,b7,98
     boolean isGRa=false,isGYR=false,isMAg=false;
     private StepDectFsm stepDectFsm=new StepDectFsm();
     private float stepLength=0f;
@@ -378,9 +378,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 //        double[][] w=calcluateDistanceweight(rttrange);
         for(int i=1;i<rttrange.length;i++){
-            l[i-1][0]=(rttrange[1]*rttrange[1]-rttrange[0]*rttrange[0]+rttrefer[0][0]*rttrefer[0][0]+
-                    rttrefer[0][1]*rttrefer[0][1]-
-                    rttrefer[i][0]*rttrefer[i][0]-rttrefer[i][1]*rttrefer[i][1])/2;
+            l[i-1][0]=(rttrange[i]*rttrange[i]-rttrange[0]*rttrange[0]+rttrefer[0][0]*rttrefer[0][0]+
+                    rttrefer[0][1]*rttrefer[0][1]-rttrefer[i][0]*rttrefer[i][0]-rttrefer[i][1]*rttrefer[i][1])/2;
             A[i-1][0]=rttrefer[0][0]-rttrefer[i][0];
             A[i-1][1]=rttrefer[0][1]-rttrefer[i][1];
         }
