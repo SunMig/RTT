@@ -374,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         double[][] x={{0},{0}};
         //需要增加实时测距数据补偿，主要是LS拟合系数0.0035，0.0648，0.4402
         for(int i=0;i<rttrange.length;i++){
-            rttrange[i]=rttrange[i]+0.0035*rttrange[i]*rttrange[i]+0.0648*rttrange[i]+0.4402;
+            rttrange[i]=rttrange[i]+0.0019*rttrange[i]*rttrange[i]+0.1153*rttrange[i]+0.18;
         }
 //        double[][] w=calcluateDistanceweight(rttrange);
         for(int i=1;i<rttrange.length;i++){
