@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 grVal=event.values.clone();
                 isGYR=true;
         }
-        float Azimuth=0f;
+        float Azimuth=0f,Pitch=0f,Roll=0f;
         if(isGYR&&isMAg&&isGRa){
             SensorManager.getRotationMatrix(Rorate,null,gVal,magVal);
             SensorManager.getOrientation(Rorate,OriVal);
@@ -256,12 +256,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             strings=sdf.format(new Date());
             strings=strings+" "+magVal[0]+" "+magVal[1]+" "+magVal[2]+" ";
             Azimuth= (float) Math.toDegrees(OriVal[0]);
+            Pitch= -(float) Math.toDegrees(OriVal[1]);
+            Roll= (float) Math.toDegrees(OriVal[2]);
+            Log.d(TAG,"Pitch is "+Pitch);
+            Log.d(TAG,"Roll is "+Roll);
             if(Azimuth<0){
                 Azimuth=Azimuth+360;
             }
 //            Azimuth=Azimuth-5.9f;
 //            Log.d(TAG,"azimuth is "+Azimuth);
-            strings=strings+stepLength+" "+Azimuth+"\n";
+            strings=strings+stepLength+" "+Azimuth+" "+Pitch+" "+Roll+" "+"\n";
             if(writeFile){
                 WritememsFileSdcard(strings);
             }
@@ -374,9 +378,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         double[][] x={{0},{0}};
         //需要增加实时测距数据补偿，主要是LS拟合系数0.0035，0.0648，0.4402
         for(int i=0;i<rttrange.length;i++){
-            rttrange[i]=rttrange[i]+0.0019*rttrange[i]*rttrange[i]+0.1153*rttrange[i]+0.18;
+            rttrange[i]=rttrange[i]+0.0039*rttrange[i]*rttrange[i]+0.1231*rttrange[i]+0.18;
         }
-//        double[][] w=calcluateDistanceweight(rttrange);
+        double[][] w=calcluateDistanceweight(rttrange);
         for(int i=1;i<rttrange.length;i++){
             l[i-1][0]=(rttrange[i]*rttrange[i]-rttrange[0]*rttrange[0]+rttrefer[0][0]*rttrefer[0][0]+
                     rttrefer[0][1]*rttrefer[0][1]-rttrefer[i][0]*rttrefer[i][0]-rttrefer[i][1]*rttrefer[i][1])/2;
@@ -386,11 +390,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         Matrix matrix_a=new Matrix(A);
         Matrix matrix_l=new Matrix(l);
-//        Matrix matrix_w=new Matrix(w);
+        Matrix matrix_w=new Matrix(w);
         Matrix X=new Matrix(x);
-//        X=((((matrix_a.transpose().times(matrix_w).times(matrix_a).inverse()))
-//                .times(matrix_a.transpose())).times(matrix_w)).times(matrix_l);
-        X=((matrix_a.transpose().times(matrix_a).inverse()).times(matrix_a.transpose())).times(matrix_l);
+        X=((((matrix_a.transpose().times(matrix_w).times(matrix_a).inverse()))
+                .times(matrix_a.transpose())).times(matrix_w)).times(matrix_l);
+//        X=((matrix_a.transpose().times(matrix_a).inverse()).times(matrix_a.transpose())).times(matrix_l);
         Log.d(TAG,"x...."+X.getMatrix(0,1,0,0));
         textView10.setText("coordinate is: "+X.getMatrix(0,1,0,0));
     }
