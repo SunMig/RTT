@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private StepDectFsm stepDectFsm=new StepDectFsm();
     private float stepLength=0f;
     private int stepcount=0;
+    float Azimuth=0f,Pitch=0f,Roll=0f;
+    private double[][] pdrcoor={{0},{0}};
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         switch (event.sensor.getType()){
             case Sensor.TYPE_ACCELEROMETER:
                 accVal=event.values.clone();
+                //判断步态的方法
                 if(stepDectFsm.StepDect(accVal)){
                     stepLength=stepDectFsm.getStepLength();
                     stepcount++;
@@ -238,28 +241,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             case Sensor.TYPE_MAGNETIC_FIELD:
                 magVal=event.values.clone();
                 isMAg=true;
-//                strings=strings+magVal[0]+" "+magVal[1]+" "+magVal[2]+" ";
                 break;
             case Sensor.TYPE_GYROSCOPE:
                 grVal=event.values.clone();
                 isGYR=true;
         }
-        float Azimuth=0f,Pitch=0f,Roll=0f;
+//        float Azimuth=0f,Pitch=0f,Roll=0f;
         if(isGYR&&isMAg&&isGRa){
             SensorManager.getRotationMatrix(Rorate,null,gVal,magVal);
             SensorManager.getOrientation(Rorate,OriVal);
+            //重置判断条件
             isGRa=false;
             isGYR=false;
             isMAg=false;
-
+            //写入内存
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
             strings=sdf.format(new Date());
             strings=strings+" "+magVal[0]+" "+magVal[1]+" "+magVal[2]+" ";
             Azimuth= (float) Math.toDegrees(OriVal[0]);
             Pitch= -(float) Math.toDegrees(OriVal[1]);
             Roll= (float) Math.toDegrees(OriVal[2]);
-            Log.d(TAG,"Pitch is "+Pitch);
-            Log.d(TAG,"Roll is "+Roll);
+//            Log.d(TAG,"Pitch is "+Pitch);
+//            Log.d(TAG,"Roll is "+Roll);
             if(Azimuth<0){
                 Azimuth=Azimuth+360;
             }
@@ -364,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     queneNextRange();
                     //定位方法实现，三角定位算法
                     LeastSquareMethod(rttrange);
+                    //考虑添加PDR计算方法
                 }
             }else {
                 Log.d(TAG, "RangingResult failed.");
@@ -397,6 +401,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //        X=((matrix_a.transpose().times(matrix_a).inverse()).times(matrix_a.transpose())).times(matrix_l);
         Log.d(TAG,"x...."+X.getMatrix(0,1,0,0));
         textView10.setText("coordinate is: "+X.getMatrix(0,1,0,0));
+        Log.d(TAG,"Azimuth is "+Azimuth+" "+stepLength);
+//        //判断条件
+//        if(stepDectFsm.StepDect(accVal)&&stepLength>0.5){
+//            double[][] pdrim_coor=pdrcalcualte();
+//            Matrix matrix_pdr=new Matrix(pdrim_coor);
+//            X=X.plus(matrix_pdr).times(0.5);
+//            Log.d(TAG,"x...."+X.getMatrix(0,1,0,0));
+//            textView10.setText("coordinate is: "+X.getMatrix(0,1,0,0));
+//        }else{
+//            Log.d(TAG,"x...."+X.getMatrix(0,1,0,0));
+//            textView10.setText("coordinate is: "+X.getMatrix(0,1,0,0));
+//        }
+
     }
     //计算距离的权重
     private double[][] calcluateDistanceweight(double[] rttrange) {
@@ -454,6 +471,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    //PDR方法推算坐标
+    private double[][] pdrcalcualte(){
+       double x=16.7d,y=3.2d;
+       x=x+stepLength*Math.cos(Azimuth);
+       y=y+stepLength*Math.sin(Azimuth);
+       pdrcoor[0][0]=x;
+       pdrcoor[1][0]=y;
+       return pdrcoor;
     }
 
     //权限申请方法
