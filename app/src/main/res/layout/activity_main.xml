@@ -10,24 +10,26 @@
         android:id="@+id/text1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Wi-Fi Ranging Results: "
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.332" />
+        app:layout_constraintVertical_bias="0.161" />
+
     <TextView
         android:id="@+id/text10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Wi-Fi Positioning Results: "
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="@+id/text1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.332" />
+        app:layout_constraintVertical_bias="0.094" />
 
     <Button
         android:id="@+id/button_1"
@@ -35,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="272dp"
         android:onClick="wifiStartscan"
-        android:text="Start Scan"
+        android:text="Start Wi-Fi Scan"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp" />
@@ -46,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="224dp"
         android:onClick="getRttScan"
-        android:text="getRTTscanResults"
+        android:text="Select APs Support RTT"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_editor_absoluteX="0dp" />
 
@@ -56,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="176dp"
         android:onClick="wifiRttScan"
-        android:text="StartRange"
+        android:text="Start Ranging"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp" />
@@ -92,17 +94,18 @@
 
         <TextView
             android:id="@+id/text2"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
+            android:layout_width="99dp"
+            android:layout_height="50dp"
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
-            android:text="Enter Sample time: "
+            android:text="Input Sampling Time: "
             android:textSize="25dp" />
+
         <EditText
             android:id="@+id/edit_text"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
 
     </LinearLayout>
 

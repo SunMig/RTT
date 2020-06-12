@@ -782,7 +782,7 @@ Matrix implements Cloneable, java.io.Serializable {
      */
     public Matrix inverse() {
         return solve(identity(m, m));
-    }
+}
 
     /** Matrix determinant
    @return     determinant

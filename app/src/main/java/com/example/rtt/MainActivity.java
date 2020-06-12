@@ -306,6 +306,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 rttresult=results;
                 rssiresult=results;
                 IterTimes=IterTimes+1;
+                /*
+                * 大于等于4个AP的时候，怎么实时实现探测到的AP的测距？
+                * */
                 if(IterTimes<5){
                     //循环迭代
                     for(int i=0;i<rttresult.size();i++){
@@ -333,10 +336,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     //测距请求
                     queneNextRange();
                 }
-                //求五次成功测距的均值，（后续可以再改）
+                //求五次成功测距的均值，（后续可以再改），2019/12/17，已有八个AP
                 if(IterTimes>=5){
                     String string="",str="";
-                    double[] rttrange=new double[4];
+                    double[] rttrange=new double[8];
                     int index=0;
                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
                     str=sdf.format(new Date())+" ";
@@ -366,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     IterTimes=0;
                     queneNextRange();
                     //定位方法实现，三角定位算法
-                    LeastSquareMethod(rttrange);
+//                    LeastSquareMethod(rttrange);0525
                     //考虑添加PDR计算方法
                 }
             }else {
@@ -391,7 +394,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             A[i-1][0]=rttrefer[0][0]-rttrefer[i][0];
             A[i-1][1]=rttrefer[0][1]-rttrefer[i][1];
         }
-
+        MatrixClass matrixClass_a=new MatrixClass(A);
         Matrix matrix_a=new Matrix(A);
         Matrix matrix_l=new Matrix(l);
         Matrix matrix_w=new Matrix(w);
@@ -400,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .times(matrix_a.transpose())).times(matrix_w)).times(matrix_l);
 //        X=((matrix_a.transpose().times(matrix_a).inverse()).times(matrix_a.transpose())).times(matrix_l);
         Log.d(TAG,"x...."+X.getMatrix(0,1,0,0));
-        textView10.setText("coordinate is: "+X.getMatrix(0,1,0,0));
+//        textView10.setText("coordinate is: "+X.getMatrix(0,1,0,0));
         Log.d(TAG,"Azimuth is "+Azimuth+" "+stepLength);
 //        //判断条件
 //        if(stepDectFsm.StepDect(accVal)&&stepLength>0.5){
