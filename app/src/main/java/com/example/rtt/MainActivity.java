@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private LinkedHashMap<String,Double> rttHashMap=new LinkedHashMap<>();
     private LinkedHashMap<String,Double> RSSIHashMap=new LinkedHashMap<>();
     private RttResultClass rttResultClass;
-    private TextView textView,textView2,textView10;
+    private TextView textView,textView2,textView10,textView5,textView6;
     private String FilePath=LocalPath.wifi_mac_txt;
     private List<String> RttMac=new ArrayList<>();
     private FileReadClass fileReadClass=new FileReadClass();
@@ -109,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         textView=(TextView)findViewById(R.id.text1);
         textView2=findViewById(R.id.text2);
         textView10=findViewById(R.id.text10);
+        textView5=findViewById(R.id.text5);
+        textView6=findViewById(R.id.text6);
         editText=findViewById(R.id.edit_text);
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiRttManager=(WifiRttManager)getApplicationContext().getSystemService(Context.WIFI_RTT_RANGING_SERVICE);
@@ -166,20 +168,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @RequiresApi(api = Build.VERSION_CODES.P)
     private void StartRanging(){
         RangingRequest.Builder builder = new RangingRequest.Builder();
-        builder.addAccessPoints(accesspointsupport802mc);
-        RangingRequest request = builder.build();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        if(accesspointsupport802mc.size()==0){
+            Toast.makeText(this,accesspointsupport802mc.size()+"RTT device were found! Ranging will not start!",
+                    Toast.LENGTH_SHORT).show();
+        }else{
+            builder.addAccessPoints(accesspointsupport802mc);
+            RangingRequest request = builder.build();
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            wifiRttManager.startRanging(request, getApplication().getMainExecutor(), rangingResultCallback);
         }
-        wifiRttManager.startRanging(request, getApplication().getMainExecutor(), rangingResultCallback);
     }
 
     //寻找满足条件AP的方法
@@ -213,8 +220,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
     //stop/reset collect
     public void stopcollectdata(View view) {
-        fileName="point_rttdata"+"_"+year+"_"+month+"_"+day+"_"+hour+"_"+minute;
-        fileMemsName="memsdata"+"_"+year+"_"+month+"_"+day+"_"+hour+"_"+minute;
+        fileName="rttdata"+"_"+year+"_"+month+"_"+day+"_"+hour+"_"+minute;
+        fileMemsName="imudata"+"_"+year+"_"+month+"_"+day+"_"+hour+"_"+minute;
         count=count+1;
         editText.setText(SampleTime+"");
 //        writeFile=false;

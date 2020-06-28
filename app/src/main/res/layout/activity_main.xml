@@ -32,27 +32,6 @@
         app:layout_constraintVertical_bias="0.094" />
 
     <Button
-        android:id="@+id/button_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="272dp"
-        android:onClick="wifiStartscan"
-        android:text="Start Wi-Fi Scan"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="0dp" />
-
-    <Button
-        android:id="@+id/button_5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="224dp"
-        android:onClick="getRttScan"
-        android:text="Select APs Support RTT"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
-
-    <Button
         android:id="@+id/button_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -71,7 +50,7 @@
         android:onClick="collectdata"
         android:text="Collect Data"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="-16dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/button_4"
@@ -85,27 +64,87 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/button_3"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="8dp">
-
-        <TextView
-            android:id="@+id/text2"
-            android:layout_width="99dp"
-            android:layout_height="50dp"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="1"
-            android:text="Input Sampling Time: "
-            android:textSize="25dp" />
-
-        <EditText
-            android:id="@+id/edit_text"
-            android:layout_width="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/button_2"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:orientation="horizontal"
+            tools:ignore="MissingConstraints"
+            android:layout_weight="1"
+            tools:layout_editor_absoluteX="8dp">
+
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="40dp"
+                android:layout_height="55dp"
+                android:layout_marginLeft="3dp"
+                android:layout_weight="1"
+                android:text="Sampling Time:"
+                android:textSize="15dp" />
+
+            <EditText
+                android:id="@+id/edit_text"
+                android:layout_width="10dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            tools:ignore="MissingConstraints"
+            android:layout_weight="1"
+            tools:layout_editor_absoluteX="8dp">
+
+            <TextView
+                android:id="@+id/text5"
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:layout_marginTop="15dp"
+                android:text="File Number:"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/text6"
+                android:layout_width="15dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/button_2">
+
+        <Button
+            android:id="@+id/button_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="1dp"
+            android:text="Start Wi-Fi Scan"
+            android:onClick="wifiStartscan"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <Button
+            android:id="@+id/button_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="getRttScan"
+            android:layout_weight="1"
+            android:text="Select APs"
+            tools:layout_editor_absoluteX="0dp" />
 
     </LinearLayout>
 

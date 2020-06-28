@@ -5,6 +5,6 @@ package com.example.rtt;
  */
 
 public class FileName {
-    public static final String str="sun";
-    public static final String strmems="sun_sensor";
+    public static final String str="WiFi_RTT";
+    public static final String strmems="IMU_SENSOR";
 }
