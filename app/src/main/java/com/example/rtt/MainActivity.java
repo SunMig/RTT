@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,13 +61,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private LinkedHashMap<String,Double> rttHashMap=new LinkedHashMap<>();
     private LinkedHashMap<String,Double> RSSIHashMap=new LinkedHashMap<>();
     private RttResultClass rttResultClass;
-    private TextView textView,textView2,textView10,textView5,textView6;
+    private TextView textView,textView2,textView3,textView4,textView10,textView5,textView6;
     private String FilePath=LocalPath.wifi_mac_txt;
     private List<String> RttMac=new ArrayList<>();
+    private HashMap<String,Point> RttPointMap=new HashMap<>();
     private FileReadClass fileReadClass=new FileReadClass();
     private int IterTimes=0,count=1;
     private double sumdistance=0d;
-    private String fileName="point_rttdata";
+    private String fileName="rttdata";
     private String fileMemsName="memsdata";
     private String sdPath;
     private boolean writeFile=false;
@@ -87,13 +89,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     float[] magVal=new float[3];
     float[] gVal=new float[3];
     float[] grVal=new float[3];
-    double[][] rttrefer={{18.4,0},{11.3,5.36},{0.85,5.36},{9.1,0}};//e0,9c,b7,98
+//    double[][] rttrefer={{18.4,0},{11.3,5.36},{0.85,5.36},{9.1,0}};//e0,9c,b7,98,要实现自适应变化
     boolean isGRa=false,isGYR=false,isMAg=false;
     private StepDectFsm stepDectFsm=new StepDectFsm();
     private float stepLength=0f;
     private int stepcount=0;
     float Azimuth=0f,Pitch=0f,Roll=0f;
     private double[][] pdrcoor={{0},{0}};
+    private Point point=new Point();
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,13 +107,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         accesspointsupport802mc = new ArrayList<ScanResult>();
         mStatisticRangeHistory=new ArrayList<>();
         RttMac=fileReadClass.ReadFileFromStorge(FilePath);
+        RttPointMap=fileReadClass.ReadCoordFileFromStorge(LocalPath.wifi_ftm_position);//0706
         fileName=fileName+"_"+year+"_"+month+"_"+day+"_"+hour+"_"+minute;
         fileMemsName=fileMemsName+"_"+year+"_"+month+"_"+day+"_"+hour+"_"+minute;
         textView=(TextView)findViewById(R.id.text1);
         textView2=findViewById(R.id.text2);
         textView10=findViewById(R.id.text10);
+        textView3=findViewById(R.id.text3);textView4=findViewById(R.id.text4);
         textView5=findViewById(R.id.text5);
-        textView6=findViewById(R.id.text6);
+        textView6=findViewById(R.id.text6);textView6.setText(""+1);
         editText=findViewById(R.id.edit_text);
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiRttManager=(WifiRttManager)getApplicationContext().getSystemService(Context.WIFI_RTT_RANGING_SERVICE);
@@ -144,15 +149,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void wifiStartscan(View view) {
         wifiManager.startScan();
         Log.d(TAG,"start scaning...");
-        Toast.makeText(this,"Start Scanning...",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Start Scanning...",Toast.LENGTH_LONG).show();
     }
     //获取满足条件的AP
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void getRttScan(View view) {
         accesspoint = wifiManager.getScanResults();
         accesspointsupport802mc = find80211mcSupportedAccessPoints(accesspoint);
-        Toast.makeText(this,accesspointsupport802mc.size()+"RTT device were found!"
-                ,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,accesspointsupport802mc.size()+"RTT device was found!"
+                ,Toast.LENGTH_LONG).show();
     }
     //RTT
     @TargetApi(Build.VERSION_CODES.P)
@@ -169,8 +174,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private void StartRanging(){
         RangingRequest.Builder builder = new RangingRequest.Builder();
         if(accesspointsupport802mc.size()==0){
-            Toast.makeText(this,accesspointsupport802mc.size()+"RTT device were found! Ranging will not start!",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,accesspointsupport802mc.size()+"RTT device was found! Ranging will not start!",
+                    Toast.LENGTH_LONG).show();
         }else{
             builder.addAccessPoints(accesspointsupport802mc);
             RangingRequest request = builder.build();
@@ -216,14 +221,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         fileName=fileName+"_"+count;
         fileMemsName=fileMemsName+"_"+count;
         writeFile=true;
+        Toast.makeText(this,"Start...",Toast.LENGTH_LONG).show();
 
-    }
+}
     //stop/reset collect
     public void stopcollectdata(View view) {
         fileName="rttdata"+"_"+year+"_"+month+"_"+day+"_"+hour+"_"+minute;
-        fileMemsName="imudata"+"_"+year+"_"+month+"_"+day+"_"+hour+"_"+minute;
+        fileMemsName="memsdata"+"_"+year+"_"+month+"_"+day+"_"+hour+"_"+minute;
         count=count+1;
         editText.setText(SampleTime+"");
+        textView6.setText(count+"");
 //        writeFile=false;
     }
 
@@ -264,7 +271,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //写入内存
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
             strings=sdf.format(new Date());
-            strings=strings+" "+magVal[0]+" "+magVal[1]+" "+magVal[2]+" ";
+            strings=strings+" "+magVal[0]+" "+magVal[1]+" "+magVal[2]+" "+accVal[0]+" "
+            +accVal[1]+" "+accVal[2]+" "+grVal[0]+" "+grVal[1]+" "+grVal[2];
             Azimuth= (float) Math.toDegrees(OriVal[0]);
             Pitch= -(float) Math.toDegrees(OriVal[1]);
             Roll= (float) Math.toDegrees(OriVal[2]);
@@ -347,27 +355,29 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if(IterTimes>=5){
                     String string="",str="";
                     double[] rttrange=new double[8];
+                    String[] rttMac=new String[8];
                     int index=0;
                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
                     str=sdf.format(new Date())+" ";
                     for(Map.Entry<String,Double> entry:rttHashMap.entrySet()){
                         double distance=entry.getValue()/5;
                         rttrange[index]=distance;
+                        rttMac[index]=entry.getKey();//0707MAC
                         Log.d(TAG,entry.getKey()+" "+distance);
                         string=string+entry.getKey()+" "+distance+'\n';
                         str=str+entry.getKey()+" "+distance+" ";
                         entry.setValue(0d);
-                        Log.d(TAG,"Stirng "+string);
+                        Log.d(TAG,"String "+string);
                         index++;
                     }
-                    Log.d(TAG,"Stirng "+string);
+                    Log.d(TAG,"String "+string);
                     for(Map.Entry<String,Double> entry:RSSIHashMap.entrySet()){
                         double rssi=entry.getValue()/5;
                         Log.d(TAG,entry.getKey()+" "+rssi);
                         str=str+" "+rssi+" ";
                         entry.setValue(0d);
                     }
-                    textView.setText(string);
+                    textView3.setText(string);
                     //满足条件，开始写入内存
                     if(writeFile){
                         str=str+'\n';
@@ -376,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     IterTimes=0;
                     queneNextRange();
                     //定位方法实现，三角定位算法
-//                    LeastSquareMethod(rttrange);0525
+                    LeastSquareMethod(rttrange,rttMac);//0525
                     //考虑添加PDR计算方法
                 }
             }else {
@@ -386,15 +396,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
     //测距定位算法（WLS算法）,目前程序支持4个AP的定位解算
-    private void LeastSquareMethod(double[] rttrange) {
-        double[][] l={{0},{0},{0}};
-        double[][] A={{0,0},{0,0},{0,0}};
+    /*
+    * 4个AP，l是3*1，A是3*2，最终结果X是2*1
+    * 3个AP，l是2*1，A是2*2,最终结果X是2*1
+    * 初始化可以和rttrange联系起来，但是具体那些AP被扫到不确定，需要一个循环把相应的坐标拿出来
+    *
+    * */
+    private void LeastSquareMethod(double[] rttrange,String[] rttMac) {
+        int len=rttrange.length;
+        double[][] l=initialarray(len-1,1);//0706
+        double[][] A=initialarray(len-1,2);
+//        double[][] rttrefer=new double[len][2];
+//        double[][] l={{0},{0},{0}};
+//        double[][] A={{0,0},{0,0},{0,0}};
         double[][] x={{0},{0}};
         //需要增加实时测距数据补偿，主要是LS拟合系数0.0035，0.0648，0.4402
         for(int i=0;i<rttrange.length;i++){
-            rttrange[i]=rttrange[i]+0.0039*rttrange[i]*rttrange[i]+0.1231*rttrange[i]+0.18;
+            if(rttrange[i]!=0){
+                rttrange[i]=rttrange[i]+0.0039*rttrange[i]*rttrange[i]+0.1231*rttrange[i]+0.18;
+            }
+//            rttrange[i]=rttrange[i]+0.0039*rttrange[i]*rttrange[i]+0.1231*rttrange[i]+0.18;
         }
         double[][] w=calcluateDistanceweight(rttrange);
+        double[][] rttrefer=selectrttposition(RttPointMap,rttrange,rttMac);//参考点坐标
+        //需要把rttrefer挑选出来
         for(int i=1;i<rttrange.length;i++){
             l[i-1][0]=(rttrange[i]*rttrange[i]-rttrange[0]*rttrange[0]+rttrefer[0][0]*rttrefer[0][0]+
                     rttrefer[0][1]*rttrefer[0][1]-rttrefer[i][0]*rttrefer[i][0]-rttrefer[i][1]*rttrefer[i][1])/2;
@@ -410,7 +435,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .times(matrix_a.transpose())).times(matrix_w)).times(matrix_l);
 //        X=((matrix_a.transpose().times(matrix_a).inverse()).times(matrix_a.transpose())).times(matrix_l);
         Log.d(TAG,"x...."+X.getMatrix(0,1,0,0));
-//        textView10.setText("coordinate is: "+X.getMatrix(0,1,0,0));
+        Matrix matrix=X.getMatrix(0,1,0,0);
+        textView4.setText("X is: "+matrix.get(0,0)+"\n"+"Y is: "+matrix.get(1,0));
         Log.d(TAG,"Azimuth is "+Azimuth+" "+stepLength);
 //        //判断条件
 //        if(stepDectFsm.StepDect(accVal)&&stepLength>0.5){
@@ -425,20 +451,58 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //        }
 
     }
+    //循环拿到选择到的AP的坐标
+    private double[][] selectrttposition(HashMap<String,Point> hashMap,double[] rttrange,String[] rttMac){
+        int len=rttrange.length;
+//        double[][] position=new double[len][2];
+        double[][] position=initialarray(len,2);
+        //找距离不是0的键0707
+        int index=0;
+        for(int i=0;i<rttrange.length;i++){
+            double d=rttrange[i];
+//            Point point=new Point();
+            if(d>0){
+                String str=rttMac[i];
+                for(Map.Entry<String,Point> entry:hashMap.entrySet()){
+                    String s=entry.getKey();
+                    if(s.equals(str)){
+                        position[index][0]=entry.getValue().getX();
+                        position[index][1]=entry.getValue().getY();
+                        }
+                }
+////                point=hashMap.get(str);
+//                position[index][0]=point.getX();
+//                position[index][1]=point.getY();
+            }
+            index=index+1;
+        }
+        return position;
+    }
     //计算距离的权重
     private double[][] calcluateDistanceweight(double[] rttrange) {
-        double[][] weight={{0,0,0},{0,0,0},{0,0,0}};
+        int len=rttrange.length;
+        double[][] weight=initialarray(len-1,len-1);
+//        double[][] weight={{0,0,0},{0,0,0},{0,0,0}};
         double sum_distance=0d;
-        for(int i=1;i<rttrange.length;i++){
+        for(int i=0;i<rttrange.length;i++){
             sum_distance=sum_distance+(rttrange[i]-rttrange[0]);
         }
-        //权重的计算
-        for(int i=0;i<3;i++){
+        //权重的计算0707
+        for(int i=0;i<len-1;i++){
             weight[i][i]=1/((rttrange[i+1]-rttrange[0])/sum_distance);
         }
         return weight;
     }
-
+    //初始化矩阵
+    private double[][] initialarray(int m,int n){
+        double[][] a=new double[m][n];
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                a[i][j]=0;
+            }
+        }
+        return a;
+    }
     //写入MEMS数据
     private void WritememsFileSdcard(String message) {
         try{
